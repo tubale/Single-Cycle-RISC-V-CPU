@@ -1,1 +1,1 @@
-# RISC-V CPU
+# Single-Cycle RISC-V CPU
