@@ -7,82 +7,48 @@
 :vpi_module "C:\msys64\ucrt64\lib\ivl\vhdl_textio.vpi";
 :vpi_module "C:\msys64\ucrt64\lib\ivl\v2005_math.vpi";
 :vpi_module "C:\msys64\ucrt64\lib\ivl\va_math.vpi";
-S_00000180b7069990 .scope module, "instruction_mem_tb" "instruction_mem_tb" 2 3;
+S_00000212755a7090 .scope module, "immediate_gen_tb" "immediate_gen_tb" 2 3;
  .timescale -9 -12;
-v00000180b7064c90_0 .var "address", 31 0;
-v00000180b70652d0_0 .net "instruction", 31 0, L_00000180b706b9b0;  1 drivers
-S_00000180b7069b20 .scope module, "dut" "instruction_mem" 2 8, 3 1 0, S_00000180b7069990;
+v00000212755a3770_0 .net "immediate", 31 0, L_00000212755a3e00;  1 drivers
+v00000212755a3810_0 .var "instruction", 31 0;
+S_00000212755a7220 .scope module, "dut" "immediate_gen" 2 8, 3 1 0, S_00000212755a7090;
  .timescale 0 0;
-    .port_info 0 /INPUT 32 "address";
-    .port_info 1 /OUTPUT 32 "instruction";
-L_00000180b706b9b0 .functor BUFZ 32, L_00000180b7064970, C4<00000000000000000000000000000000>, C4<00000000000000000000000000000000>, C4<00000000000000000000000000000000>;
-v00000180b7052a40_0 .net *"_ivl_2", 31 0, L_00000180b7064970;  1 drivers
-v00000180b7052ae0_0 .net *"_ivl_4", 7 0, L_00000180b70650f0;  1 drivers
-L_00000180b72d0088 .functor BUFT 1, C4<00>, C4<0>, C4<0>, C4<0>;
-v00000180b7064ab0_0 .net *"_ivl_7", 1 0, L_00000180b72d0088;  1 drivers
-v00000180b70646f0_0 .net "address", 31 0, v00000180b7064c90_0;  1 drivers
-v00000180b70648d0_0 .net "index", 5 0, L_00000180b7064790;  1 drivers
-v00000180b7064dd0_0 .net "instruction", 31 0, L_00000180b706b9b0;  alias, 1 drivers
-v00000180b7064bf0 .array "memory", 63 0, 31 0;
-L_00000180b7064790 .part v00000180b7064c90_0, 2, 6;
-L_00000180b7064970 .array/port v00000180b7064bf0, L_00000180b70650f0;
-L_00000180b70650f0 .concat [ 6 2 0 0], L_00000180b7064790, L_00000180b72d0088;
-    .scope S_00000180b7069b20;
+    .port_info 0 /INPUT 32 "instruction";
+    .port_info 1 /OUTPUT 32 "immediate";
+v0000021275593d90_0 .net *"_ivl_1", 0 0, L_00000212755a38b0;  1 drivers
+v0000021275593e30_0 .net *"_ivl_3", 19 0, L_00000212755a3fe0;  1 drivers
+v000002127556ddd0_0 .net *"_ivl_5", 11 0, L_00000212755a4080;  1 drivers
+v00000212755a73b0_0 .net "immediate", 31 0, L_00000212755a3e00;  alias, 1 drivers
+v00000212755a7450_0 .net "instruction", 31 0, v00000212755a3810_0;  1 drivers
+L_00000212755a38b0 .part v00000212755a3810_0, 31, 1;
+L_00000212755a3fe0 .repeat 20, 20, L_00000212755a38b0;
+L_00000212755a4080 .part v00000212755a3810_0, 20, 12;
+L_00000212755a3e00 .concat [ 12 20 0 0], L_00000212755a4080, L_00000212755a3fe0;
+    .scope S_00000212755a7090;
 T_0 ;
+    %vpi_call 2 14 "$dumpfile", "wave.vcd" {0 0 0};
+    %vpi_call 2 15 "$dumpvars", 32'sb00000000000000000000000000000000, S_00000212755a7090 {0 0 0};
     %pushi/vec4 5243027, 0, 32;
-    %ix/load 4, 0, 0;
-    %flag_set/imm 4, 0;
-    %store/vec4a v00000180b7064bf0, 4, 0;
+    %store/vec4 v00000212755a3810_0, 0, 32;
+    %delay 10000, 0;
     %pushi/vec4 7340307, 0, 32;
-    %ix/load 4, 1, 0;
-    %flag_set/imm 4, 0;
-    %store/vec4a v00000180b7064bf0, 4, 0;
-    %pushi/vec4 2130355, 0, 32;
-    %ix/load 4, 2, 0;
-    %flag_set/imm 4, 0;
-    %store/vec4a v00000180b7064bf0, 4, 0;
-    %pushi/vec4 3285027, 0, 32;
-    %ix/load 4, 3, 0;
-    %flag_set/imm 4, 0;
-    %store/vec4a v00000180b7064bf0, 4, 0;
-    %pushi/vec4 139907, 0, 32;
-    %ix/load 4, 4, 0;
-    %flag_set/imm 4, 0;
-    %store/vec4a v00000180b7064bf0, 4, 0;
+    %store/vec4 v00000212755a3810_0, 0, 32;
+    %delay 10000, 0;
+    %pushi/vec4 4286579091, 0, 32;
+    %store/vec4 v00000212755a3810_0, 0, 32;
+    %delay 10000, 0;
+    %pushi/vec4 4293919251, 0, 32;
+    %store/vec4 v00000212755a3810_0, 0, 32;
+    %delay 10000, 0;
+    %pushi/vec4 12657283, 0, 32;
+    %store/vec4 v00000212755a3810_0, 0, 32;
+    %delay 10000, 0;
+    %vpi_call 2 52 "$finish" {0 0 0};
     %end;
     .thread T_0;
-    .scope S_00000180b7069990;
-T_1 ;
-    %vpi_call 2 14 "$dumpfile", "wave.vcd" {0 0 0};
-    %vpi_call 2 15 "$dumpvars", 32'sb00000000000000000000000000000000, S_00000180b7069990 {0 0 0};
-    %vpi_call 2 17 "$monitor", "Time=%0t | Address=%0d | Instruction=%h", $time, v00000180b7064c90_0, v00000180b70652d0_0 {0 0 0};
-    %pushi/vec4 0, 0, 32;
-    %store/vec4 v00000180b7064c90_0, 0, 32;
-    %delay 10000, 0;
-    %pushi/vec4 4, 0, 32;
-    %store/vec4 v00000180b7064c90_0, 0, 32;
-    %delay 10000, 0;
-    %pushi/vec4 8, 0, 32;
-    %store/vec4 v00000180b7064c90_0, 0, 32;
-    %delay 10000, 0;
-    %pushi/vec4 12, 0, 32;
-    %store/vec4 v00000180b7064c90_0, 0, 32;
-    %delay 10000, 0;
-    %pushi/vec4 16, 0, 32;
-    %store/vec4 v00000180b7064c90_0, 0, 32;
-    %delay 10000, 0;
-    %pushi/vec4 252, 0, 32;
-    %store/vec4 v00000180b7064c90_0, 0, 32;
-    %delay 10000, 0;
-    %pushi/vec4 256, 0, 32;
-    %store/vec4 v00000180b7064c90_0, 0, 32;
-    %delay 10000, 0;
-    %vpi_call 2 48 "$finish" {0 0 0};
-    %end;
-    .thread T_1;
 # The file index is used to find the file name in the following table.
 :file_names 4;
     "N/A";
     "<interactive>";
-    "sim/instruction_mem_tb.v";
-    "rtl/instruction_mem.v";
+    "sim/immediate_gen_tb.v";
+    "rtl/immediate_gen.v";

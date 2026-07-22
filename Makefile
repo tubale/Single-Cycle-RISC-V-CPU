@@ -1,4 +1,4 @@
-TOP = instruction_mem
+TOP = immediate_gen
 
 all:
 	iverilog -o sim.out rtl/$(TOP).v sim/$(TOP)_tb.v
