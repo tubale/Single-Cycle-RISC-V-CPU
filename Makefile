@@ -1,4 +1,4 @@
-TOP = data_memory
+TOP = cpu
 
 all:
 	iverilog -o sim.out rtl/$(TOP).v sim/$(TOP)_tb.v
