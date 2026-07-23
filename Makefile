@@ -1,4 +1,4 @@
-TOP = alu
+TOP = control_unit
 
 all:
 	iverilog -o sim.out rtl/$(TOP).v sim/$(TOP)_tb.v
