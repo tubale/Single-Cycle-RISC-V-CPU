@@ -37,8 +37,6 @@ The processor implements the complete **fetch–decode–execute** cycle using a
 | LW | Load Word |
 | SW | Store Word |
 
-> Branch instructions (BEQ) and additional RV32I instructions are currently under development.
-
 ---
 
 ## Processor Architecture
