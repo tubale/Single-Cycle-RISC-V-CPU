@@ -1,7 +1,7 @@
 TOP = cpu
 
 all:
-	iverilog -o sim.out rtl/$(TOP).v sim/$(TOP)_tb.v
+	iverilog -o sim.out rtl/*.v sim/$(TOP)_tb.v
 
 run:
 	vvp sim.out

@@ -22,6 +22,10 @@ initial begin
     memory[2] = 32'h002081B3;
     memory[3] = 32'h00322023;
     memory[4] = 32'h00022283;
+    memory[5] = 32'h00A00213; // addi x4, x0, 10
+    memory[6] = 32'h00C00293; // addi x5, x0, 12
+    memory[7] = 32'h00520333; // add  x6, x4, x5
+    memory[8] = 32'h003303B3; // add x7, x6, x3
 end
 
 endmodule
