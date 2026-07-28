@@ -84,7 +84,7 @@ always @(*) begin
 
         end
 
-        // Memory
+        // S-Type Memory
         // LW
         7'b0000011: begin
 
@@ -105,7 +105,8 @@ always @(*) begin
             alu_control = 4'b0000;
 
         end
-
+        
+        // B-type 
         // BEQ
         7'b1100011: begin
 

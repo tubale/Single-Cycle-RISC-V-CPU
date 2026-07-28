@@ -19,6 +19,8 @@ wire [31:0] write_back_data;
 
 // Immediate Generator
 wire [31:0] immediate;
+wire [31:0] branch_target;
+wire branch_taken;
 
 // ALU
 wire [31:0] alu_result;
@@ -36,8 +38,8 @@ wire mem_write;
 wire mem_to_reg;
 wire branch;
 wire [3:0] alu_control;
-// Program Counter
 
+// Program Counter
 pc pc_inst(
     .clk(clk),
     .rst(reset),
@@ -104,7 +106,9 @@ data_memory dmem(
 
 assign alu_input2 = alu_src ? immediate : read_data2;
 assign write_back_data = mem_to_reg ? memory_read_data : alu_result;
-assign next_pc = pc + 32'd4;
+assign branch_target = pc + immediate;
+assign branch_taken = branch && zero;
+assign next_pc = branch_taken ? branch_target : pc + 32'd4;
 
 
 endmodule

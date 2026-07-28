@@ -20,6 +20,7 @@ initial begin
     // sw   x3, 0(x4)
     // lw   x5, 0(x4)
 
+    // Testing R-Type instructions
     memory[0] = 32'h00500093;
     memory[1] = 32'h00700113;
     memory[2] = 32'h002081B3;
@@ -28,8 +29,10 @@ initial begin
     memory[5] = 32'h00A00213; // addi x4, x0, 10
     memory[6] = 32'h00C00293; // addi x5, x0, 12
     memory[7] = 32'h00520333; // add  x6, x4, x5
-    memory[8] = 32'h003303B3; // add x7, x6, x3 */
+    memory[8] = 32'h003303B3; // add x7, x6, x3 
 
+
+    // Testing I-Type instructions
     memory[0] = 32'h00A00093; // addi x1, x0, 10
     memory[1] = 32'h00C00113; // addi x2, x0, 12
 
@@ -40,6 +43,16 @@ initial begin
 
     // NOPs (No Operations)
     for (i = 6; i < 256; i = i + 1)
+        memory[i] = 32'h00000013; // addi x0, x0, 0 */
+
+    //Testing BEQs
+    memory[0] = 32'h00500093;   // addi x1, x0, 5
+    memory[1] = 32'h00500113;   // addi x2, x0, 5
+    memory[2] = 32'h00208463;   // beq  x1, x2, +8
+    memory[3] = 32'h06300193;   // addi x3, x0, 99
+    memory[4] = 32'h00100213;   // done: addi x4, x0, 1
+
+    for (i = 5; i < 256; i = i + 1)
         memory[i] = 32'h00000013; // addi x0, x0, 0
     
 end
