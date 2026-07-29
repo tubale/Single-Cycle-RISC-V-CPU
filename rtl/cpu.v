@@ -4,6 +4,7 @@ module cpu(
     input reset
 
 );
+
 // Wires
 // Program Counter
 wire [31:0] pc;
@@ -20,7 +21,8 @@ wire [31:0] write_back_data;
 // Immediate Generator
 wire [31:0] immediate;
 wire [31:0] branch_target;
-wire branch_taken;
+wire [31:0] jump_target;
+reg branch_taken;
 
 // ALU
 wire [31:0] alu_result;
@@ -36,8 +38,10 @@ wire alu_src;
 wire mem_read;
 wire mem_write;
 wire mem_to_reg;
-wire branch;
+wire [1:0] branch_type;
+wire jump;
 wire [3:0] alu_control;
+
 
 // Program Counter
 pc pc_inst(
@@ -47,11 +51,13 @@ pc pc_inst(
     .pc(pc)
 );
 
+
 // Instruction Memory
 instruction_mem imem(
     .address(pc),
     .instruction(instruction)
 );
+
 
 // Register File
 register_file rf(
@@ -65,11 +71,13 @@ register_file rf(
     .read_data2(read_data2)
 );
 
+
 // Immediate Generator
 immediate_gen imm_gen(
     .instruction(instruction),
     .immediate(immediate)
 );
+
 
 // Control Unit
 control_unit cu(
@@ -81,9 +89,11 @@ control_unit cu(
     .mem_read(mem_read),
     .mem_write(mem_write),
     .mem_to_reg(mem_to_reg),
-    .branch(branch),
+    .branch_type(branch_type),
+    .jump(jump),
     .alu_control(alu_control)
 );
+
 
 // ALU
 alu alu_inst(
@@ -93,6 +103,7 @@ alu alu_inst(
     .result(alu_result),
     .zero(zero)
 );
+
 
 // Data Memory
 data_memory dmem(
@@ -104,11 +115,39 @@ data_memory dmem(
     .read_data(memory_read_data)
 );
 
-assign alu_input2 = alu_src ? immediate : read_data2;
+
+// Branch Logic
+always @(*) begin
+
+    case(branch_type)
+
+        // BEQ
+        2'b01:
+            branch_taken = zero;
+
+        // BNE
+        2'b10:
+            branch_taken = ~zero;
+
+        default:
+            branch_taken = 1'b0;
+
+    endcase
+
+end
+
+
+// Datapath Assignments
+assign alu_input2      = alu_src ? immediate : read_data2;
 assign write_back_data = mem_to_reg ? memory_read_data : alu_result;
+
 assign branch_target = pc + immediate;
-assign branch_taken = branch && zero;
-assign next_pc = branch_taken ? branch_target : pc + 32'd4;
+assign jump_target   = branch_target;   // Placeholder for JAL
+
+assign next_pc =
+    jump ? jump_target :
+    branch_taken ? branch_target :
+    pc + 32'd4;
 
 
 endmodule

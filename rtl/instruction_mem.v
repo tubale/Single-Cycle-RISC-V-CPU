@@ -43,7 +43,7 @@ initial begin
 
     // NOPs (No Operations)
     for (i = 6; i < 256; i = i + 1)
-        memory[i] = 32'h00000013; // addi x0, x0, 0 */
+        memory[i] = 32'h00000013; // addi x0, x0, 0 
 
     //Testing BEQs
     memory[0] = 32'h00500093;   // addi x1, x0, 5
@@ -53,7 +53,20 @@ initial begin
     memory[4] = 32'h00100213;   // done: addi x4, x0, 1
 
     for (i = 5; i < 256; i = i + 1)
-        memory[i] = 32'h00000013; // addi x0, x0, 0
+        memory[i] = 32'h00000013; // addi x0, x0, 0 */
+
+    // Testing BNE
+    // addi x1, x0, 5
+    memory[0] = 32'h00500093;
+    // addi x2, x0, 6
+    memory[1] = 32'h00600113;
+    // bne x1, x2, done
+    memory[2] = 32'h00209463;
+    // addi x3, x0, 99 -> (should be skipped)
+    memory[3] = 32'h06300193;
+    // done:
+    // addi x4, x0, 1
+    memory[4] = 32'h00100213;
     
 end
 
