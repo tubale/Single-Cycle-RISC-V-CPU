@@ -8,7 +8,7 @@ module control_unit(
     output reg alu_src,
     output reg mem_read,
     output reg mem_write,
-    output reg mem_to_reg,
+    output reg [1:0] wb_select,
     output reg [1:0] branch_type,
     output reg jump,
     output reg [3:0] alu_control
@@ -22,7 +22,7 @@ always @(*) begin
     alu_src     = 0;
     mem_read    = 0;
     mem_write   = 0;
-    mem_to_reg  = 0;
+    wb_select   = 2'b00;    // ALU
     branch_type = 2'b00;
     jump        = 1'b0;
     alu_control = 4'b0000;
@@ -34,7 +34,7 @@ always @(*) begin
 
             reg_write  = 1;
             alu_src    = 0;
-            mem_to_reg = 0;
+            wb_select  = 2'b00;
 
             case(funct3)
 
@@ -45,6 +45,7 @@ always @(*) begin
                     else if(funct7 == 7'b0100000)
                         alu_control = 4'b0001;   // SUB
                 end
+
                 // AND
                 3'b111:
                     alu_control = 4'b0010;
@@ -73,7 +74,7 @@ always @(*) begin
 
             reg_write   = 1;
             alu_src     = 1;
-            mem_to_reg  = 0;
+            wb_select   = 2'b00;
 
             case(funct3)
 
@@ -99,43 +100,41 @@ always @(*) begin
 
         end
 
-        // I-Type Load
         // LW
         7'b0000011: begin
 
             reg_write   = 1;
             alu_src     = 1;
             mem_read    = 1;
-            mem_to_reg  = 1;
+            wb_select   = 2'b01;    // Memory
             alu_control = 4'b0000;
 
         end
 
-        // S-Type Store
         // SW
         7'b0100011: begin
 
             alu_src     = 1;
             mem_write   = 1;
+            wb_select   = 2'b00;    // Doesn't matter
             alu_control = 4'b0000;
 
         end
 
-        // B-Type Branches
+        // BEQ / BNE
         7'b1100011: begin
 
             alu_src     = 0;
-            alu_control = 4'b0001;   // SUB for comparison
+            wb_select   = 2'b00;    // Doesn't matter
+            alu_control = 4'b0001;  // SUB
 
             case(funct3)
 
-                // BEQ
                 3'b000:
-                    branch_type = 2'b01;
+                    branch_type = 2'b01; // BEQ
 
-                // BNE
                 3'b001:
-                    branch_type = 2'b10;
+                    branch_type = 2'b10; // BNE
 
                 default:
                     branch_type = 2'b00;
@@ -144,14 +143,12 @@ always @(*) begin
 
         end
 
-        // J-Type
-        // (JAL will be added next)
-        /*
+        // JAL
         7'b1101111: begin
-            jump = 1'b1;
-            reg_write = 1;
+            jump       = 1'b1;
+            reg_write  = 1'b1;
+            wb_select  = 2'b10;   // Write PC+4
         end
-        */
 
     endcase
 

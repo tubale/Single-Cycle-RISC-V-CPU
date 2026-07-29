@@ -26,7 +26,14 @@ always @(*) begin
                         instruction[30:25],   // imm[10:5]
                         instruction[11:8],    // imm[4:1]
                         1'b0};                // imm[0]
-
+        // J-Type
+        7'b1101111:
+            immediate = {{11{instruction[31]}},
+                 instruction[31],      // imm[20]
+                 instruction[19:12],   // imm[19:12]
+                 instruction[20],      // imm[11]
+                 instruction[30:21],   // imm[10:1]
+                 1'b0};                // imm[0]
         default:
             immediate = 32'd0;
 

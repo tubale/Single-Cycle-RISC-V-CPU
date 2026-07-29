@@ -35,8 +35,6 @@ initial begin
 
     $dumpfile("wave.vcd");
     $dumpvars(0, data_memory_tb);
-
-    //=================================
     // Write 55 to address 0
     //=================================
     address = 32'd0;

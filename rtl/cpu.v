@@ -9,6 +9,7 @@ module cpu(
 // Program Counter
 wire [31:0] pc;
 wire [31:0] next_pc;
+wire [31:0] pc_plus_4;
 
 // Instruction Memory
 wire [31:0] instruction;
@@ -37,7 +38,7 @@ wire reg_write;
 wire alu_src;
 wire mem_read;
 wire mem_write;
-wire mem_to_reg;
+wire [1:0] wb_select;
 wire [1:0] branch_type;
 wire jump;
 wire [3:0] alu_control;
@@ -88,7 +89,7 @@ control_unit cu(
     .alu_src(alu_src),
     .mem_read(mem_read),
     .mem_write(mem_write),
-    .mem_to_reg(mem_to_reg),
+    .wb_select(wb_select),
     .branch_type(branch_type),
     .jump(jump),
     .alu_control(alu_control)
@@ -138,8 +139,14 @@ end
 
 
 // Datapath Assignments
-assign alu_input2      = alu_src ? immediate : read_data2;
-assign write_back_data = mem_to_reg ? memory_read_data : alu_result;
+assign alu_input2 = alu_src ? immediate : read_data2;
+
+assign pc_plus_4 = pc + 32'd4;
+
+assign write_back_data =
+    (wb_select == 2'b00) ? alu_result :
+    (wb_select == 2'b01) ? memory_read_data :
+                           pc_plus_4;
 
 assign branch_target = pc + immediate;
 assign jump_target   = branch_target;   // Placeholder for JAL
@@ -147,7 +154,7 @@ assign jump_target   = branch_target;   // Placeholder for JAL
 assign next_pc =
     jump ? jump_target :
     branch_taken ? branch_target :
-    pc + 32'd4;
+    pc_plus_4;
 
 
 endmodule
