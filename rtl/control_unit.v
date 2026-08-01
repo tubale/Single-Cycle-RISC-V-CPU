@@ -11,7 +11,8 @@ module control_unit(
     output reg [1:0] wb_select,
     output reg [1:0] branch_type,
     output reg jump,
-    output reg [3:0] alu_control
+    output reg [3:0] alu_control,
+    output reg jalr
 
 );
 
@@ -25,6 +26,7 @@ always @(*) begin
     wb_select   = 2'b00;    // ALU
     branch_type = 2'b00;
     jump        = 1'b0;
+    jalr        = 1'b0;
     alu_control = 4'b0000;
 
     case(opcode)
@@ -142,12 +144,23 @@ always @(*) begin
             endcase
 
         end
-
+        // J type
         // JAL
         7'b1101111: begin
             jump       = 1'b1;
             reg_write  = 1'b1;
             wb_select  = 2'b10;   // Write PC+4
+            jalr       = 1'b0;
+        end
+
+        // I-Type
+        // JALR
+        7'b1100111: begin
+            reg_write   = 1'b1;
+            jump        = 1'b1;
+            alu_src     = 1'b1;
+            wb_select   = 2'b10;
+            jalr        = 1'b1;
         end
 
     endcase

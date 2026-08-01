@@ -42,6 +42,7 @@ wire [1:0] wb_select;
 wire [1:0] branch_type;
 wire jump;
 wire [3:0] alu_control;
+wire jalr;
 
 
 // Program Counter
@@ -92,7 +93,8 @@ control_unit cu(
     .wb_select(wb_select),
     .branch_type(branch_type),
     .jump(jump),
-    .alu_control(alu_control)
+    .alu_control(alu_control),
+    .jalr(jalr)
 );
 
 
@@ -149,12 +151,15 @@ assign write_back_data =
                            pc_plus_4;
 
 assign branch_target = pc + immediate;
-assign jump_target   = branch_target;   // Placeholder for JAL
+
+assign jump_target =
+    jalr ?
+        ((read_data1 + immediate) & 32'hFFFFFFFE) :
+        branch_target;
 
 assign next_pc =
     jump ? jump_target :
     branch_taken ? branch_target :
     pc_plus_4;
-
 
 endmodule

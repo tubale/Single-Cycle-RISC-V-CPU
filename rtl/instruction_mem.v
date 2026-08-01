@@ -3,14 +3,15 @@ module instruction_mem (
     output [31:0] instruction
 );
 
-reg [31:0] memory [0:63];
-wire [5:0] index;
-
-assign index = address[7:2];
-assign instruction = memory[index];
+reg [31:0] memory [0:255];
+assign instruction = memory[address[9:2]];
 integer i;
 
 initial begin
+    for(i = 0; i < 256; i = i + 1)
+        memory[i] = 32'h00000013;   // NOP
+
+    $readmemh("program.mem", memory);
     /* Sample adding things
 
     // Program:
@@ -28,7 +29,7 @@ initial begin
     memory[4] = 32'h00022283;
     memory[5] = 32'h00A00213; // addi x4, x0, 10
     memory[6] = 32'h00C00293; // addi x5, x0, 12
-    memory[7] = 32'h00520333; // add  x6, x4, x5
+    memory[7] = 32'h00520333; // add  x6, x4, x5    
     memory[8] = 32'h003303B3; // add x7, x6, x3 
 
 
@@ -66,7 +67,7 @@ initial begin
     memory[3] = 32'h06300193;
     // done:
     // addi x4, x0, 1
-    memory[4] = 32'h00100213; */
+    memory[4] = 32'h00100213; 
 
     // Testing JAL
     // jal x1, target (+8 bytes)
@@ -75,8 +76,22 @@ initial begin
     memory[1] = 32'h06300113;
     // target:
     // addi x3, x0, 5
-    memory[2] = 32'h00500193;
-    
+    memory[2] = 32'h00500193; 
+
+    // Testing JALR
+    // addi x5, x0, 12
+    memory[0] = 32'h00C00293;
+
+    // jalr x1, x5, 0
+    memory[1] = 32'h000280E7;
+
+    // addi x2, x0, 99
+    // (should be skipped)
+    memory[2] = 32'h06300113;
+
+    // target:
+    // addi x3, x0, 5
+    memory[3] = 32'h00500193; */
 end
 
 endmodule
