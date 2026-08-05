@@ -3,12 +3,12 @@ module instruction_mem (
     output [31:0] instruction
 );
 
-reg [31:0] memory [0:255];
-assign instruction = memory[address[9:2]];
+reg [31:0] memory [0:16383];
+assign instruction = memory[address[15:2]];
 integer i;
 
 initial begin
-    for(i = 0; i < 256; i = i + 1)
+    for(i = 0; i < 16384; i = i + 1)
         memory[i] = 32'h00000013;   // NOP
 
     $readmemh("program.mem", memory);
