@@ -22,7 +22,7 @@ It supports register and immediate ALU operations, memory access, conditional br
 
 ## Processor Architecture
 
-!Processor Architecture](GTKWaves/arch.PNG)
+![Processor Architecture](GTKWaves/arch.PNG)
 
 ---
 
