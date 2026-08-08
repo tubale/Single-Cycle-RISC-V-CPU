@@ -365,7 +365,7 @@ JAL   JALR
 > Add your final regression terminal screenshot here.
 
 ```markdown
-![RV32I Regression Results](docs/regression-results.png)
+![RV32I Regression Results](GTKwaves/all_test_past.PNG)
 ```
 
 ---
@@ -409,7 +409,7 @@ jump_target
 
 This makes it possible to visually follow instructions through the complete single-cycle datapath.
 
-![CPU GTKWave Verification](GTKWaves/CPU-waveform.png)
+![CPU GTKWave Verification](GTKWaves/CPU-waveform.PNG)
 
 ### Control-Flow Example
 
