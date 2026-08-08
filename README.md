@@ -118,164 +118,56 @@ The current processor implements **17 instructions**.
 | | `JALR` | Jump and link register |
 
 ---
-
 # How the CPU Works
 
-## 1. Instruction Fetch
+The processor uses a **single-cycle architecture**, meaning each instruction completes the full fetch, decode, execute, memory, and write-back process within one clock cycle.
 
-The Program Counter contains the address of the current instruction.
+### 1. Instruction Fetch
 
-```text
-PC → Instruction Memory → 32-bit Instruction
-```
+The **Program Counter (PC)** holds the address of the current instruction. Instruction memory uses this address to fetch the corresponding 32-bit RISC-V instruction.
 
-Under normal execution:
+### 2. Instruction Decode
 
-```text
-next_pc = pc + 4
-```
+The instruction is decoded by the **Control Unit**, which generates the control signals required for execution. The **Register File** simultaneously reads the source registers specified by the instruction.
 
-Branch and jump instructions can instead select a calculated target address.
+### 3. Immediate Generation
 
----
+For instructions containing an immediate value, the **Immediate Generator** extracts and sign-extends the immediate according to the RISC-V instruction format.
 
-## 2. Instruction Decode
+### 4. Execute
 
-The instruction is separated into RISC-V fields:
+The **ALU** performs the required arithmetic, logical, or comparison operation. A multiplexer selects either register data or the immediate value as the second ALU operand.
 
-```text
-31                    25 24      20 19      15 14   12 11       7 6       0
-┌───────────────────────┬──────────┬──────────┬───────┬──────────┬─────────┐
-│        funct7         │   rs2    │   rs1    │funct3 │    rd    │ opcode  │
-└───────────────────────┴──────────┴──────────┴───────┴──────────┴─────────┘
-```
+Supported ALU operations include:
 
-The Control Unit uses `opcode`, `funct3`, and `funct7` to generate signals controlling the datapath.
+`ADD` `SUB` `AND` `OR` `XOR` `SLT`
 
-These include:
+### 5. Memory Access
 
-```text
-reg_write
-alu_src
-mem_read
-mem_write
-wb_select
-branch_type
-jump
-jalr
-alu_control
-```
+Load and store instructions use the ALU result as the data-memory address.
 
----
+- `LW` reads a 32-bit word from memory.
+- `SW` writes a 32-bit word to memory.
 
-## 3. Register Read
+### 6. Write-Back
 
-The register file contains 32 general-purpose 32-bit registers.
+The write-back logic selects the value returned to the Register File. Depending on the instruction, this can be the **ALU result, memory data, or PC + 4**.
 
-It provides two asynchronous read ports:
+### 7. Branches and Jumps
+
+Branch instructions compare register values and redirect the PC when the branch condition is satisfied.
+
+`BEQ` and `BNE` use conditional branch targets, while `JAL` and `JALR` implement unconditional jumps. Jump instructions also write **PC + 4** to the destination register.
+
+### Single-Cycle Execution
+
+Because the processor is single-cycle, all of these operations occur during one clock period:
 
 ```text
-rs1 → read_data1
-rs2 → read_data2
+Fetch → Decode → Execute → Memory → Write-Back
 ```
 
-and one synchronous write port:
-
-```text
-rd ← write_back_data
-```
-
-Register `x0` remains hardwired to zero.
-
----
-
-## 4. Immediate Generation
-
-The Immediate Generator reconstructs and sign-extends immediate values for the supported RISC-V instruction formats.
-
-Supported immediate formats include:
-
-```text
-I-Type
-S-Type
-B-Type
-J-Type
-```
-
-The generated 32-bit immediate can be used by the ALU or by branch/jump target calculations.
-
----
-
-## 5. Execute
-
-The ALU performs arithmetic, logical, and comparison operations.
-
-```text
-                ┌──────────────┐
-read_data1 ────►│              │
-                │     ALU      ├────► alu_result
-alu_input2 ────►│              │
-                └──────────────┘
-                       ▲
-                       │
-                  alu_control
-```
-
-The second ALU operand is selected between:
-
-```text
-read_data2
-     OR
-immediate
-```
-
-depending on `alu_src`.
-
----
-
-## 6. Memory Access
-
-`LW` and `SW` use the ALU result as the data-memory address.
-
-For a store:
-
-```text
-Register File → Data Memory
-```
-
-For a load:
-
-```text
-Data Memory → Write-Back MUX → Register File
-```
-
----
-
-## 7. Branch and Jump Control
-
-For `BEQ` and `BNE`, the ALU compares the source registers and produces the `zero` flag.
-
-Branch logic determines whether:
-
-```text
-next_pc = pc + 4
-```
-
-or:
-
-```text
-next_pc = pc + immediate
-```
-
-`JAL` redirects execution to a PC-relative target while writing `PC + 4` into `rd`.
-
-`JALR` calculates its target using:
-
-```text
-(rs1 + immediate) & 0xFFFFFFFE
-```
-
-and also writes `PC + 4` into `rd`.
+At the next clock edge, the PC is updated and execution begins for the next instruction.
 
 ---
 
