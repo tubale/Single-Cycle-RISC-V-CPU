@@ -508,6 +508,7 @@ x15 = 1
 memory[0] = 14
 ```
 ![Example process](GTKWaves/CPU_waveform.PNG)
+
 ## Compile the CPU
 
 ```bash
@@ -579,4 +580,5 @@ Electrical and Computer Engineering
 Purdue University
 
 **GitHub:** [https://github.com/tubale](https://github.com/tubale) 
+
 **LinkedIn:** https://www.linkedin.com/in/tanayubale/
