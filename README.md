@@ -405,7 +405,7 @@ jump_target
 
 This makes it possible to visually follow instructions through the complete single-cycle datapath.
 
-![CPU GTKWave Verification](GTKWaves/CPU_waveform.PNG)
+![CPU GTKWave Verification](GTKWaves/cpu_gtkwave.PNG)
 
 ### Control-Flow Example
 
@@ -507,7 +507,7 @@ x15 = 1
 
 memory[0] = 14
 ```
-
+![Example process](GTKWaves/CPU_waveform.PNG)
 ## Compile the CPU
 
 ```bash
