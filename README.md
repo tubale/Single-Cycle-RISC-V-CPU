@@ -22,61 +22,7 @@ It supports register and immediate ALU operations, memory access, conditional br
 
 ## Processor Architecture
 
-```text
-                         ┌──────────────────┐
-                         │ Program Counter  │
-                         └────────┬─────────┘
-                                  │
-                                  ▼
-                         ┌──────────────────┐
-                         │Instruction Memory│
-                         └────────┬─────────┘
-                                  │
-                             Instruction
-                                  │
-                  ┌───────────────┴───────────────┐
-                  │                               │
-                  ▼                               ▼
-          ┌──────────────┐                ┌───────────────┐
-          │ Control Unit │                │ Register File │
-          └──────┬───────┘                └───────┬───────┘
-                 │                                │
-                 │                       ┌────────┴────────┐
-                 │                       │ Immediate Gen. │
-                 │                       └────────┬────────┘
-                 │                                │
-                 └────────────────┬───────────────┘
-                                  │
-                                  ▼
-                          ┌───────────────┐
-                          │ ALU Input MUX │
-                          └───────┬───────┘
-                                  │
-                                  ▼
-                             ┌─────────┐
-                             │   ALU   │
-                             └────┬────┘
-                                  │
-                 ┌────────────────┼────────────────┐
-                 │                │                │
-                 ▼                ▼                ▼
-          Branch Logic      Data Memory       ALU Result
-                 │                │                │
-                 └────────┐       │       ┌────────┘
-                          │       ▼       │
-                          │  ┌──────────┐ │
-                          │  │Write-Back│ │
-                          │  │   MUX    │ │
-                          │  └────┬─────┘ │
-                          │       │       │
-                          │       ▼       │
-                          │ Register File │
-                          │               │
-                          ▼               │
-                     Next-PC Logic ◄──────┘
-                          │
-                          └──────► PC
-```
+!Processor Architecture](GTKWaves/arch.PNG)
 
 ---
 
