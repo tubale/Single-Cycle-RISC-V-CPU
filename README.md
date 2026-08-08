@@ -17,6 +17,7 @@ datapath.
 The design integrates a **32-bit Program Counter, Instruction Memory, 32 × 32-bit Register File, Immediate Generator, Control Unit, ALU, Data Memory, and control-flow logic** into a complete processor.
 
 It supports register and immediate ALU operations, memory access, conditional branches, and jump instructions.
+
 ---
 
 ## Processor Architecture
