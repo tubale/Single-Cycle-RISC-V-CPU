@@ -364,9 +364,9 @@ JAL   JALR
 
 > Add your final regression terminal screenshot here.
 
-```markdown
+
 ![RV32I Regression Results](GTKWaves/all_test_past.PNG)
-```
+
 
 ---
 
