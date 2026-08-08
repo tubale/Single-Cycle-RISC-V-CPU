@@ -508,50 +508,6 @@ x15 = 1
 memory[0] = 14
 ```
 
----
-
-# Project Structure
-
-```text
-Single-Cycle-RISC-V-CPU/
-│
-├── rtl/
-│   ├── cpu.v
-│   ├── pc.v
-│   ├── instruction_mem.v
-│   ├── register_file.v
-│   ├── immediate_gen.v
-│   ├── control_unit.v
-│   ├── alu.v
-│   └── data_memory.v
-│
-├── sim/
-│   ├── cpu_tb.v
-│   └── cpu_wave_tb.v
-│
-├── verify/
-│   ├── encoder.py
-│   ├── runner.py
-│   └── regression.py
-│
-├── programs/
-│   └── waveform_demo.mem
-│
-├── docs/
-│   ├── cpu-waveform.png
-│   ├── regression-results.png
-│   ├── alu-synth.svg
-│   └── cpu-synth.svg
-│
-├── Makefile
-├── .gitignore
-└── README.md
-```
-
----
-
-# Running the Project
-
 ## Compile the CPU
 
 ```bash
