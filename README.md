@@ -361,10 +361,6 @@ LW    SW
 BEQ   BNE
 JAL   JALR
 ```
-
-> Add your final regression terminal screenshot here.
-
-
 ![RV32I Regression Results](GTKWaves/all_test_past.PNG)
 
 
