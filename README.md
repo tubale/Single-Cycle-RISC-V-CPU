@@ -14,82 +14,15 @@ The processor executes each instruction in a single clock cycle through the comp
 
 datapath.
 
-The design includes:
+The design integrates a **32-bit Program Counter, Instruction Memory, 32 × 32-bit Register File, Immediate Generator, Control Unit, ALU, Data Memory, and control-flow logic** into a complete processor.
 
-- 32-bit Program Counter
-- Instruction Memory
-- 32 × 32-bit Register File
-- Immediate Generator
-- Control Unit
-- Arithmetic Logic Unit
-- Data Memory
-- Branch Decision Logic
-- Jump / Jump-Register Logic
-- ALU Input Multiplexer
-- Write-Back Multiplexer
-- Next-PC Selection Logic
-
-The CPU supports register-register operations, immediate arithmetic, memory access, conditional branches, and control-flow instructions.
+It supports register and immediate ALU operations, memory access, conditional branches, and jump instructions.
 
 ---
 
 ## Processor Architecture
 
-```text
-                         ┌──────────────────┐
-                         │ Program Counter  │
-                         └────────┬─────────┘
-                                  │
-                                  ▼
-                         ┌──────────────────┐
-                         │Instruction Memory│
-                         └────────┬─────────┘
-                                  │
-                             Instruction
-                                  │
-                  ┌───────────────┴───────────────┐
-                  │                               │
-                  ▼                               ▼
-          ┌──────────────┐                ┌───────────────┐
-          │ Control Unit │                │ Register File │
-          └──────┬───────┘                └───────┬───────┘
-                 │                                │
-                 │                       ┌────────┴────────┐
-                 │                       │ Immediate Gen. │
-                 │                       └────────┬────────┘
-                 │                                │
-                 └────────────────┬───────────────┘
-                                  │
-                                  ▼
-                          ┌───────────────┐
-                          │ ALU Input MUX │
-                          └───────┬───────┘
-                                  │
-                                  ▼
-                             ┌─────────┐
-                             │   ALU   │
-                             └────┬────┘
-                                  │
-                 ┌────────────────┼────────────────┐
-                 │                │                │
-                 ▼                ▼                ▼
-          Branch Logic      Data Memory       ALU Result
-                 │                │                │
-                 └────────┐       │       ┌────────┘
-                          │       ▼       │
-                          │  ┌──────────┐ │
-                          │  │Write-Back│ │
-                          │  │   MUX    │ │
-                          │  └────┬─────┘ │
-                          │       │       │
-                          │       ▼       │
-                          │ Register File │
-                          │               │
-                          ▼               │
-                     Next-PC Logic ◄──────┘
-                          │
-                          └──────► PC
-```
+!Processor Architecture](GTKWaves/arch.PNG)
 
 ---
 
@@ -118,164 +51,56 @@ The current processor implements **17 instructions**.
 | | `JALR` | Jump and link register |
 
 ---
-
 # How the CPU Works
 
-## 1. Instruction Fetch
+The processor uses a **single-cycle architecture**, meaning each instruction completes the full fetch, decode, execute, memory, and write-back process within one clock cycle.
 
-The Program Counter contains the address of the current instruction.
+### 1. Instruction Fetch
 
-```text
-PC → Instruction Memory → 32-bit Instruction
-```
+The **Program Counter (PC)** holds the address of the current instruction. Instruction memory uses this address to fetch the corresponding 32-bit RISC-V instruction.
 
-Under normal execution:
+### 2. Instruction Decode
 
-```text
-next_pc = pc + 4
-```
+The instruction is decoded by the **Control Unit**, which generates the control signals required for execution. The **Register File** simultaneously reads the source registers specified by the instruction.
 
-Branch and jump instructions can instead select a calculated target address.
+### 3. Immediate Generation
 
----
+For instructions containing an immediate value, the **Immediate Generator** extracts and sign-extends the immediate according to the RISC-V instruction format.
 
-## 2. Instruction Decode
+### 4. Execute
 
-The instruction is separated into RISC-V fields:
+The **ALU** performs the required arithmetic, logical, or comparison operation. A multiplexer selects either register data or the immediate value as the second ALU operand.
 
-```text
-31                    25 24      20 19      15 14   12 11       7 6       0
-┌───────────────────────┬──────────┬──────────┬───────┬──────────┬─────────┐
-│        funct7         │   rs2    │   rs1    │funct3 │    rd    │ opcode  │
-└───────────────────────┴──────────┴──────────┴───────┴──────────┴─────────┘
-```
+Supported ALU operations include:
 
-The Control Unit uses `opcode`, `funct3`, and `funct7` to generate signals controlling the datapath.
+`ADD` `SUB` `AND` `OR` `XOR` `SLT`
 
-These include:
+### 5. Memory Access
 
-```text
-reg_write
-alu_src
-mem_read
-mem_write
-wb_select
-branch_type
-jump
-jalr
-alu_control
-```
+Load and store instructions use the ALU result as the data-memory address.
 
----
+- `LW` reads a 32-bit word from memory.
+- `SW` writes a 32-bit word to memory.
 
-## 3. Register Read
+### 6. Write-Back
 
-The register file contains 32 general-purpose 32-bit registers.
+The write-back logic selects the value returned to the Register File. Depending on the instruction, this can be the **ALU result, memory data, or PC + 4**.
 
-It provides two asynchronous read ports:
+### 7. Branches and Jumps
+
+Branch instructions compare register values and redirect the PC when the branch condition is satisfied.
+
+`BEQ` and `BNE` use conditional branch targets, while `JAL` and `JALR` implement unconditional jumps. Jump instructions also write **PC + 4** to the destination register.
+
+### Single-Cycle Execution
+
+Because the processor is single-cycle, all of these operations occur during one clock period:
 
 ```text
-rs1 → read_data1
-rs2 → read_data2
+Fetch → Decode → Execute → Memory → Write-Back
 ```
 
-and one synchronous write port:
-
-```text
-rd ← write_back_data
-```
-
-Register `x0` remains hardwired to zero.
-
----
-
-## 4. Immediate Generation
-
-The Immediate Generator reconstructs and sign-extends immediate values for the supported RISC-V instruction formats.
-
-Supported immediate formats include:
-
-```text
-I-Type
-S-Type
-B-Type
-J-Type
-```
-
-The generated 32-bit immediate can be used by the ALU or by branch/jump target calculations.
-
----
-
-## 5. Execute
-
-The ALU performs arithmetic, logical, and comparison operations.
-
-```text
-                ┌──────────────┐
-read_data1 ────►│              │
-                │     ALU      ├────► alu_result
-alu_input2 ────►│              │
-                └──────────────┘
-                       ▲
-                       │
-                  alu_control
-```
-
-The second ALU operand is selected between:
-
-```text
-read_data2
-     OR
-immediate
-```
-
-depending on `alu_src`.
-
----
-
-## 6. Memory Access
-
-`LW` and `SW` use the ALU result as the data-memory address.
-
-For a store:
-
-```text
-Register File → Data Memory
-```
-
-For a load:
-
-```text
-Data Memory → Write-Back MUX → Register File
-```
-
----
-
-## 7. Branch and Jump Control
-
-For `BEQ` and `BNE`, the ALU compares the source registers and produces the `zero` flag.
-
-Branch logic determines whether:
-
-```text
-next_pc = pc + 4
-```
-
-or:
-
-```text
-next_pc = pc + immediate
-```
-
-`JAL` redirects execution to a PC-relative target while writing `PC + 4` into `rd`.
-
-`JALR` calculates its target using:
-
-```text
-(rs1 + immediate) & 0xFFFFFFFE
-```
-
-and also writes `PC + 4` into `rd`.
+At the next clock edge, the PC is updated and execution begins for the next instruction.
 
 ---
 
@@ -283,151 +108,51 @@ and also writes `PC + 4` into `rd`.
 
 The CPU was verified at both the **module level** and **processor level**.
 
-## Module-Level Verification
+### Module-Level Verification
 
-Individual Verilog testbenches were used during development to verify:
+Each major hardware block was first tested independently using custom Verilog testbenches, including the Program Counter, Instruction Memory, Register File, Immediate Generator, Control Unit, ALU, and Data Memory.
 
-- Program Counter
-- Instruction Memory
-- Register File
-- Immediate Generator
-- Control Unit
-- ALU
-- Data Memory
+GTKWave was used throughout development to inspect the behavior of each module and verify signals, timing, control logic, and data flow before integrating the complete CPU.
 
-This allowed individual hardware blocks to be debugged before full CPU integration.
+Waveforms from these tests can be found in the [`GTKWaves/`](GTKWaves/) directory.
 
----
+### Automated CPU Regression Testing
 
-## Automated Randomized Regression Testing
+After integration, the complete CPU was verified using a **Python-driven randomized regression framework**.
 
-A Python-driven regression framework was developed to automatically generate RISC-V programs, execute them on the Verilog CPU, and compare the resulting processor state against expected values.
+For each supported instruction, the framework:
 
-```text
-Random Operands
-      │
-      ▼
-┌──────────────┐
-│  encoder.py  │
-└──────┬───────┘
-       │
-       │ RV32I machine code
-       ▼
-   program.mem
-       │
-       ▼
-┌──────────────────┐
-│ Verilog CPU      │
-│ Icarus Verilog   │
-└────────┬─────────┘
-         │
-         │ Register / Memory Dump
-         ▼
-┌──────────────┐
-│  runner.py   │
-└──────┬───────┘
-       │
-       ▼
-Expected Result vs. Hardware Result
-       │
-       ▼
- PASS / FAIL
-```
+1. Generates randomized input values.
+2. Encodes them into RV32I machine instructions.
+3. Loads the generated program into instruction memory.
+4. Runs the CPU using Icarus Verilog.
+5. Reads the resulting register and memory state.
+6. Compares the hardware result against the expected result.
 
-The encoder generates machine-code instructions directly from randomized operands.
+This provides repeatable processor-level verification across many different operand combinations rather than relying only on hand-written test programs.
 
-For example:
+The regression suite covers all **17 implemented instructions**:
 
-```python
-program = [
-    encode_addi(1, 0, a),
-    encode_addi(2, 0, b),
-    encode_add(3, 1, 2)
-]
-```
+`ADD` `SUB` `AND` `OR` `XOR` `SLT`  
+`ADDI` `ANDI` `ORI` `XORI` `SLTI`  
+`LW` `SW` `BEQ` `BNE` `JAL` `JALR`
 
-The simulation is executed automatically and the resulting register/memory state is parsed and checked by Python.
-
-This allows each instruction to be tested across many different input combinations rather than relying only on manually written programs.
-
-### Regression Coverage
-
-The regression suite covers all currently implemented instructions:
-
-```text
-ADD   SUB   AND   OR    XOR   SLT
-ADDI  ANDI  ORI   XORI  SLTI
-LW    SW
-BEQ   BNE
-JAL   JALR
-```
 ![RV32I Regression Results](GTKWaves/all_test_past.PNG)
 
 
 ---
 
-# Waveform Verification
+### Full CPU Waveform Verification
 
-A dedicated demonstration program exercises arithmetic, logical, memory, branch, and jump instructions while internal datapath signals are captured in GTKWave.
+In addition to automated testing, the complete processor was inspected in GTKWave using a demonstration program that exercises the datapath.
 
-The waveform exposes signals including:
-
-```text
-pc
-instruction
-next_pc
-
-read_data1
-read_data2
-immediate
-
-alu_control
-alu_input2
-alu_result
-zero
-
-reg_write
-wb_select
-write_back_data
-
-mem_read
-mem_write
-memory_read_data
-
-branch_type
-branch_taken
-branch_target
-
-jump
-jalr
-jump_target
-```
+Signals such as the **PC, instruction, register operands, immediate, ALU result, memory controls, write-back data, branch decisions, and jump targets** were monitored to verify instruction execution through the single-cycle datapath.
 
 This makes it possible to visually follow instructions through the complete single-cycle datapath.
 
 ![CPU GTKWave Verification](GTKWaves/cpu_gtkwave.PNG)
 
-### Control-Flow Example
-
-During the waveform demonstration, taken branches and jumps cause the PC to skip instructions:
-
-```text
-...
-0x34
-0x38
-0x3C
-0x44    ← BEQ skips 0x40
-0x48
-0x50    ← BNE skips 0x4C
-0x54
-0x5C    ← JAL skips 0x58
-0x60
-...
-```
-
-This provides a visual check of branch decisions, target generation, and next-PC selection.
-
----
+A more detailed example of CPU execution and the corresponding waveform is shown below.
 
 # RTL Synthesis
 
@@ -473,41 +198,45 @@ The full schematic is linked rather than embedded because the processor contains
 
 ---
 
-# Example Program
-
-A simple program executed by the processor:
+## Example CPU Execution
+### Program
 
 ```assembly
-addi x1, x0, 10
-addi x2, x0, 4
+addi x1, x0, 10       # x1 = 10
+addi x2, x0, 4        # x2 = 4
 
-add  x3, x1, x2
-sub  x4, x1, x2
+add  x3, x1, x2       # x3 = 14
+sub  x4, x1, x2       # x4 = 6
 
-sw   x3, 0(x0)
-lw   x14, 0(x0)
+sw   x3, 0(x0)        # memory[0] = 14
+lw   x14, 0(x0)       # x14 = 14
 
-beq  x3, x14, equal
+beq  x3, x14, equal   # Branch taken because 14 == 14
 
-addi x15, x0, 99
+addi x15, x0, 99      # Skipped
 
 equal:
-addi x15, x0, 1
+addi x15, x0, 1       # x15 = 1
 ```
 
-Expected processor state includes:
+### Expected Execution
 
-```text
-x1  = 10
-x2  = 4
-x3  = 14
-x4  = 6
-x14 = 14
-x15 = 1
+| PC | Instruction | Result |
+|---:|---|---|
+| `0x00` | `addi x1, x0, 10` | `x1 = 10` |
+| `0x04` | `addi x2, x0, 4` | `x2 = 4` |
+| `0x08` | `add x3, x1, x2` | `x3 = 14` |
+| `0x0C` | `sub x4, x1, x2` | `x4 = 6` |
+| `0x10` | `sw x3, 0(x0)` | `memory[0] = 14` |
+| `0x14` | `lw x14, 0(x0)` | `x14 = 14` |
+| `0x18` | `beq x3, x14, +8` | Branch taken |
+| `0x1C` | `addi x15, x0, 99` | **Skipped** |
+| `0x20` | `addi x15, x0, 1` | `x15 = 1` |
 
-memory[0] = 14
-```
-![Example process](GTKWaves/CPU_waveform.PNG)
+### Waveform
+
+![CPU Waveform](GTKWaves/CPU_waveform.PNG)
+
 ## Compile the CPU
 
 ```bash
@@ -579,4 +308,5 @@ Electrical and Computer Engineering
 Purdue University
 
 **GitHub:** [https://github.com/tubale](https://github.com/tubale) 
+
 **LinkedIn:** https://www.linkedin.com/in/tanayubale/
