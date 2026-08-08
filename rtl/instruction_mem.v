@@ -6,5 +6,6 @@ module instruction_mem (
     reg [31:0] memory [0:16383];
 
     assign instruction = memory[address[15:2]];
+    
 
 endmodule
