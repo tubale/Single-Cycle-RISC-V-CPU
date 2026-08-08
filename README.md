@@ -283,151 +283,51 @@ and also writes `PC + 4` into `rd`.
 
 The CPU was verified at both the **module level** and **processor level**.
 
-## Module-Level Verification
+### Module-Level Verification
 
-Individual Verilog testbenches were used during development to verify:
+Each major hardware block was first tested independently using custom Verilog testbenches, including the Program Counter, Instruction Memory, Register File, Immediate Generator, Control Unit, ALU, and Data Memory.
 
-- Program Counter
-- Instruction Memory
-- Register File
-- Immediate Generator
-- Control Unit
-- ALU
-- Data Memory
+GTKWave was used throughout development to inspect the behavior of each module and verify signals, timing, control logic, and data flow before integrating the complete CPU.
 
-This allowed individual hardware blocks to be debugged before full CPU integration.
+Waveforms from these tests can be found in the [`GTKWaves/`](GTKWaves/) directory.
 
----
+### Automated CPU Regression Testing
 
-## Automated Randomized Regression Testing
+After integration, the complete CPU was verified using a **Python-driven randomized regression framework**.
 
-A Python-driven regression framework was developed to automatically generate RISC-V programs, execute them on the Verilog CPU, and compare the resulting processor state against expected values.
+For each supported instruction, the framework:
 
-```text
-Random Operands
-      │
-      ▼
-┌──────────────┐
-│  encoder.py  │
-└──────┬───────┘
-       │
-       │ RV32I machine code
-       ▼
-   program.mem
-       │
-       ▼
-┌──────────────────┐
-│ Verilog CPU      │
-│ Icarus Verilog   │
-└────────┬─────────┘
-         │
-         │ Register / Memory Dump
-         ▼
-┌──────────────┐
-│  runner.py   │
-└──────┬───────┘
-       │
-       ▼
-Expected Result vs. Hardware Result
-       │
-       ▼
- PASS / FAIL
-```
+1. Generates randomized input values.
+2. Encodes them into RV32I machine instructions.
+3. Loads the generated program into instruction memory.
+4. Runs the CPU using Icarus Verilog.
+5. Reads the resulting register and memory state.
+6. Compares the hardware result against the expected result.
 
-The encoder generates machine-code instructions directly from randomized operands.
+This provides repeatable processor-level verification across many different operand combinations rather than relying only on hand-written test programs.
 
-For example:
+The regression suite covers all **17 implemented instructions**:
 
-```python
-program = [
-    encode_addi(1, 0, a),
-    encode_addi(2, 0, b),
-    encode_add(3, 1, 2)
-]
-```
+`ADD` `SUB` `AND` `OR` `XOR` `SLT`  
+`ADDI` `ANDI` `ORI` `XORI` `SLTI`  
+`LW` `SW` `BEQ` `BNE` `JAL` `JALR`
 
-The simulation is executed automatically and the resulting register/memory state is parsed and checked by Python.
-
-This allows each instruction to be tested across many different input combinations rather than relying only on manually written programs.
-
-### Regression Coverage
-
-The regression suite covers all currently implemented instructions:
-
-```text
-ADD   SUB   AND   OR    XOR   SLT
-ADDI  ANDI  ORI   XORI  SLTI
-LW    SW
-BEQ   BNE
-JAL   JALR
-```
 ![RV32I Regression Results](GTKWaves/all_test_past.PNG)
 
 
 ---
 
-# Waveform Verification
+### Full CPU Waveform Verification
 
-A dedicated demonstration program exercises arithmetic, logical, memory, branch, and jump instructions while internal datapath signals are captured in GTKWave.
+In addition to automated testing, the complete processor was inspected in GTKWave using a demonstration program that exercises the datapath.
 
-The waveform exposes signals including:
-
-```text
-pc
-instruction
-next_pc
-
-read_data1
-read_data2
-immediate
-
-alu_control
-alu_input2
-alu_result
-zero
-
-reg_write
-wb_select
-write_back_data
-
-mem_read
-mem_write
-memory_read_data
-
-branch_type
-branch_taken
-branch_target
-
-jump
-jalr
-jump_target
-```
+Signals such as the **PC, instruction, register operands, immediate, ALU result, memory controls, write-back data, branch decisions, and jump targets** were monitored to verify instruction execution through the single-cycle datapath.
 
 This makes it possible to visually follow instructions through the complete single-cycle datapath.
 
 ![CPU GTKWave Verification](GTKWaves/cpu_gtkwave.PNG)
 
-### Control-Flow Example
-
-During the waveform demonstration, taken branches and jumps cause the PC to skip instructions:
-
-```text
-...
-0x34
-0x38
-0x3C
-0x44    ← BEQ skips 0x40
-0x48
-0x50    ← BNE skips 0x4C
-0x54
-0x5C    ← JAL skips 0x58
-0x60
-...
-```
-
-This provides a visual check of branch decisions, target generation, and next-PC selection.
-
----
+A more detailed example of CPU execution and the corresponding waveform is shown below.
 
 # RTL Synthesis
 
