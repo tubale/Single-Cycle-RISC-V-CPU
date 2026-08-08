@@ -409,7 +409,7 @@ jump_target
 
 This makes it possible to visually follow instructions through the complete single-cycle datapath.
 
-![CPU GTKWave Verification](GTKWaves/cpu-waveform.png)
+![CPU GTKWave Verification](GTKWaves/CPU-waveform.png)
 
 ### Control-Flow Example
 
