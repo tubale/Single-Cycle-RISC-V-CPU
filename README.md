@@ -14,23 +14,9 @@ The processor executes each instruction in a single clock cycle through the comp
 
 datapath.
 
-The design includes:
+The design integrates a **32-bit Program Counter, Instruction Memory, 32 × 32-bit Register File, Immediate Generator, Control Unit, ALU, Data Memory, and control-flow logic** into a complete processor.
 
-- 32-bit Program Counter
-- Instruction Memory
-- 32 × 32-bit Register File
-- Immediate Generator
-- Control Unit
-- Arithmetic Logic Unit
-- Data Memory
-- Branch Decision Logic
-- Jump / Jump-Register Logic
-- ALU Input Multiplexer
-- Write-Back Multiplexer
-- Next-PC Selection Logic
-
-The CPU supports register-register operations, immediate arithmetic, memory access, conditional branches, and control-flow instructions.
-
+It supports register and immediate ALU operations, memory access, conditional branches, and jump instructions.
 ---
 
 ## Processor Architecture
