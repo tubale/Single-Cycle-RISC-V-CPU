@@ -510,7 +510,7 @@ addi x15, x0, 1       # x15 = 1
 
 ### Waveform
 
-![CPU Waveform](docs/CPU_waveform.png)
+![CPU Waveform](GTKWaves/CPU_waveform.PNG)
 
 ## Compile the CPU
 
