@@ -459,7 +459,7 @@ was synthesized into corresponding `$add`, `$sub`, `$and`, `$or`, and `$xor` har
 
 The following schematic was generated directly from the Verilog RTL using Yosys and Graphviz:
 
-![Synthesized ALU](rtl/alu-synth.svg)
+![Synthesized ALU](rtl/alu_synth.svg)
 
 The schematic shows the arithmetic/logic hardware and control-selection network inferred from the ALU RTL.
 
@@ -467,7 +467,7 @@ The schematic shows the arithmetic/logic hardware and control-selection network 
 
 The complete processor was also passed through the Yosys synthesis flow to inspect the combined datapath and control implementation.
 
-[View Full CPU Synthesis Schematic](rtl/cpu-synth.svg)
+[View Full CPU Synthesis Schematic](rtl/cpu_synth.svg)
 
 The full schematic is linked rather than embedded because the processor contains significantly more logic than the individual ALU.
 
