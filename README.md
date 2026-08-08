@@ -473,41 +473,44 @@ The full schematic is linked rather than embedded because the processor contains
 
 ---
 
-# Example Program
-
-A simple program executed by the processor:
+## Example CPU Execution
+### Program
 
 ```assembly
-addi x1, x0, 10
-addi x2, x0, 4
+addi x1, x0, 10       # x1 = 10
+addi x2, x0, 4        # x2 = 4
 
-add  x3, x1, x2
-sub  x4, x1, x2
+add  x3, x1, x2       # x3 = 14
+sub  x4, x1, x2       # x4 = 6
 
-sw   x3, 0(x0)
-lw   x14, 0(x0)
+sw   x3, 0(x0)        # memory[0] = 14
+lw   x14, 0(x0)       # x14 = 14
 
-beq  x3, x14, equal
+beq  x3, x14, equal   # Branch taken because 14 == 14
 
-addi x15, x0, 99
+addi x15, x0, 99      # Skipped
 
 equal:
-addi x15, x0, 1
+addi x15, x0, 1       # x15 = 1
 ```
 
-Expected processor state includes:
+### Expected Execution
 
-```text
-x1  = 10
-x2  = 4
-x3  = 14
-x4  = 6
-x14 = 14
-x15 = 1
+| PC | Instruction | Result |
+|---:|---|---|
+| `0x00` | `addi x1, x0, 10` | `x1 = 10` |
+| `0x04` | `addi x2, x0, 4` | `x2 = 4` |
+| `0x08` | `add x3, x1, x2` | `x3 = 14` |
+| `0x0C` | `sub x4, x1, x2` | `x4 = 6` |
+| `0x10` | `sw x3, 0(x0)` | `memory[0] = 14` |
+| `0x14` | `lw x14, 0(x0)` | `x14 = 14` |
+| `0x18` | `beq x3, x14, +8` | Branch taken |
+| `0x1C` | `addi x15, x0, 99` | **Skipped** |
+| `0x20` | `addi x15, x0, 1` | `x15 = 1` |
 
-memory[0] = 14
-```
-![Example process](GTKWaves/CPU_waveform.PNG)
+### Waveform
+
+![CPU Waveform](docs/CPU_waveform.png)
 
 ## Compile the CPU
 
