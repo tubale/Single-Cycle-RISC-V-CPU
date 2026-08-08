@@ -199,43 +199,41 @@ The full schematic is linked rather than embedded because the processor contains
 ---
 
 ## Example CPU Execution
-### Program
+
+The waveform below shows the processor executing a short sequence of RV32I instructions through the single-cycle datapath.
+
+### Example Program
 
 ```assembly
-addi x1, x0, 10       # x1 = 10
-addi x2, x0, 4        # x2 = 4
-
-add  x3, x1, x2       # x3 = 14
-sub  x4, x1, x2       # x4 = 6
-
-sw   x3, 0(x0)        # memory[0] = 14
-lw   x14, 0(x0)       # x14 = 14
-
-beq  x3, x14, equal   # Branch taken because 14 == 14
-
-addi x15, x0, 99      # Skipped
-
-equal:
-addi x15, x0, 1       # x15 = 1
+addi x1, x0, 5       # x1 = 5
+addi x2, x0, 7       # x2 = 7
+add  x3, x1, x2      # x3 = 12
+sw   x3, 0(x4)       # Store x3 to memory
+lw   x5, 0(x4)       # Load value back into x5
 ```
 
-### Expected Execution
+### Execution
 
 | PC | Instruction | Result |
-|---:|---|---|
-| `0x00` | `addi x1, x0, 10` | `x1 = 10` |
-| `0x04` | `addi x2, x0, 4` | `x2 = 4` |
-| `0x08` | `add x3, x1, x2` | `x3 = 14` |
-| `0x0C` | `sub x4, x1, x2` | `x4 = 6` |
-| `0x10` | `sw x3, 0(x0)` | `memory[0] = 14` |
-| `0x14` | `lw x14, 0(x0)` | `x14 = 14` |
-| `0x18` | `beq x3, x14, +8` | Branch taken |
-| `0x1C` | `addi x15, x0, 99` | **Skipped** |
-| `0x20` | `addi x15, x0, 1` | `x15 = 1` |
+|---|---|---|
+| `0x00` | `addi x1, x0, 5` | `x1 = 5` |
+| `0x04` | `addi x2, x0, 7` | `x2 = 7` |
+| `0x08` | `add x3, x1, x2` | `x3 = 12` |
+| `0x0C` | `sw x3, 0(x4)` | Stores `12` to data memory |
+| `0x10` | `lw x5, 0(x4)` | Loads `12` from data memory |
 
-### Waveform
+### GTKWave Verification
 
 ![CPU Waveform](GTKWaves/CPU_waveform.PNG)
+
+
+The waveform shows the **PC advancing by 4 bytes each cycle** as instructions move through the processor.
+
+At `PC = 0x08`, the `ADD` instruction reads `5` and `7` from the register file and the ALU produces `0x0000000C` (12). The following `SW` instruction asserts the memory write control to store the result, and `LW` reads the value back from data memory.
+
+The waveform also exposes the internal datapath signals—including the instruction, ALU inputs/result, register data, immediate value, memory controls, next PC, and write-back data—allowing instruction execution to be followed through the complete CPU.
+
+---
 
 ## Compile the CPU
 
