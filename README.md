@@ -154,21 +154,33 @@ This makes it possible to visually follow instructions through the complete sing
 
 A more detailed example of CPU execution and the corresponding waveform is shown below.
 
-# RTL Synthesis
+## RTL Synthesis
 
-The processor RTL was synthesized using **Yosys** to verify that the behavioral Verilog could be translated into hardware structures.
+The complete processor was synthesized using both **Yosys** and **AMD Vivado** to verify that the Verilog RTL could be successfully translated into digital hardware structures using two different synthesis flows.
 
-During synthesis, RTL operations were converted into hardware elements including:
+While RTL simulation and regression testing verify the **functional behavior** of the processor, synthesis verifies that the design can be elaborated and converted into a hardware netlist.
 
-- Adders
-- Subtractors
+---
+
+## Yosys Synthesis
+
+The processor was first synthesized using **Yosys**, an open-source RTL synthesis framework.
+
+Yosys reads the Verilog hierarchy, elaborates the processor modules, converts behavioral RTL into hardware cells, and performs logic optimization.
+
+During synthesis, RTL operations are translated into hardware structures including:
+
+- Adders and subtractors
 - Comparators
 - Multiplexers
 - Flip-flops
 - Boolean logic
-- Register and memory control logic
+- Register control logic
+- Branch and jump selection logic
 
-For example, the ALU RTL:
+### Synthesized ALU
+
+The ALU was synthesized independently to inspect how arithmetic and logical Verilog operations are translated into hardware.
 
 ```verilog
 result = a + b;
@@ -178,26 +190,56 @@ result = a | b;
 result = a ^ b;
 ```
 
-was synthesized into corresponding `$add`, `$sub`, `$and`, `$or`, and `$xor` hardware cells.
+Yosys translates these RTL operations into corresponding arithmetic and logical hardware cells, with multiplexing logic selecting the correct result based on the ALU control signal.
 
-## Synthesized ALU
+![Yosys ALU Synthesis](GTKWaves/alu_synth.png)
 
-The following schematic was generated directly from the Verilog RTL using Yosys and Graphviz:
+### Full CPU Yosys Synthesis
 
-![Synthesized ALU](rtl/alu_synth.svg)
+The complete processor was then synthesized as a single integrated design.
 
-The schematic shows the arithmetic/logic hardware and control-selection network inferred from the ALU RTL.
+![Yosys Full CPU Synthesis](GTKWaves/cpu_synth.png)
 
-## Full CPU Synthesis
+The synthesized design contains the combined datapath and control logic required by the processor, including:
 
-The complete processor was also passed through the Yosys synthesis flow to inspect the combined datapath and control implementation.
+- Program Counter and next-PC logic
+- Register File
+- Immediate generation
+- Arithmetic and logical operations
+- Branch comparison logic
+- JAL and JALR target logic
+- Memory control logic
+- Write-back selection
+- Control decoding
+- Datapath multiplexers
 
-[View Full CPU Synthesis Schematic](rtl/cpu_synth.svg)
+The full CPU schematic is significantly larger than the individual ALU because it represents the interconnected logic required to execute all **17 supported RV32I instructions**.
 
-The full schematic is linked rather than embedded because the processor contains significantly more logic than the individual ALU.
+Successful Yosys synthesis demonstrates that the complete processor RTL can be elaborated and translated into a digital logic netlist rather than functioning only as behavioral simulation code.
+
+For a higher-resolution view:
+
+[View Full CPU Yosys Schematic](rtl/cpu_synth.svg)
 
 ---
 
+## Vivado Synthesis
+
+The complete CPU was also synthesized using **AMD Vivado** to verify the design using a commercial FPGA development toolchain.
+
+Vivado elaborates the Verilog RTL, checks the design hierarchy, performs logic optimization, and synthesizes the processor toward the selected AMD/Xilinx FPGA architecture.
+
+### Vivado Synthesized Design
+
+After RTL elaboration, the processor was synthesized using Vivado.
+
+![Vivado Synthesized Design](GTKWaves/vivado_picutre.PNG)
+
+The synthesized schematic shows the processor after Vivado has optimized and mapped the RTL toward FPGA hardware resources.
+
+High-level Verilog operations are transformed into lower-level hardware structures implementing the processor's arithmetic, control, storage, and datapath logic.
+
+---
 ## Example CPU Execution
 
 The waveform below shows the processor executing a short sequence of RV32I instructions through the single-cycle datapath.
