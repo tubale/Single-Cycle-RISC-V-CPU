@@ -192,13 +192,13 @@ result = a ^ b;
 
 Yosys translates these RTL operations into corresponding arithmetic and logical hardware cells, with multiplexing logic selecting the correct result based on the ALU control signal.
 
-![Yosys ALU Synthesis](GTKWaves/alu_synth.png)
+![Yosys ALU Synthesis](rtl/alu_synth.svg)
 
 ### Full CPU Yosys Synthesis
 
 The complete processor was then synthesized as a single integrated design.
 
-![Yosys Full CPU Synthesis](GTKWaves/cpu_synth.png)
+![Yosys Full CPU Synthesis](rtl/cpu_synth.svg)
 
 The synthesized design contains the combined datapath and control logic required by the processor, including:
 
