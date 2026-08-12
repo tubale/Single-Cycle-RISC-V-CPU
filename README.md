@@ -191,14 +191,17 @@ result = a ^ b;
 ```
 
 Yosys translates these RTL operations into corresponding arithmetic and logical hardware cells, with multiplexing logic selecting the correct result based on the ALU control signal.
-
-![Yosys ALU Synthesis](rtl/alu_synth.svg)
+<p align="center">
+  <img src="rtl/alu_synth.svg" width="700">
+</p>
 
 ### Full CPU Yosys Synthesis
 
 The complete processor was then synthesized as a single integrated design.
 
-![Yosys Full CPU Synthesis](rtl/cpu_synth.svg)
+<p align="center">
+  <img src="rtl/cpu_synth.svg" width="700">
+</p>
 
 The synthesized design contains the combined datapath and control logic required by the processor, including:
 
@@ -233,7 +236,7 @@ Vivado elaborates the Verilog RTL, checks the design hierarchy, performs logic o
 
 After RTL elaboration, the processor was synthesized using Vivado.
 
-![Vivado Synthesized Design](GTKWaves/vivado_picutre.PNG)
+![Vivado Synthesized Design](GTKWaves/vivado_picture.PNG)
 
 The synthesized schematic shows the processor after Vivado has optimized and mapped the RTL toward FPGA hardware resources.
 
